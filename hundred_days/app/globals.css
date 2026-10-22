@@ -1,26 +1,259 @@
 @import "tailwindcss";
 
+/* ---------- 90s desktop palette ---------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --desktop: #008080;
+  --face: #c0c0c0;
+  --hi: #ffffff;
+  --shadow: #808080;
+  --dark: #404040;
+  --title: #000080;
+  --ink: #000000;
+  --muted: #303030;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--desktop);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  background: var(--desktop);
+  color: var(--ink);
+  font-family: Verdana, Tahoma, Geneva, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.font-pixel {
+  font-family: var(--font-pixel), Verdana, sans-serif;
+}
+
+/* ---------- Bevels ---------- */
+.raised {
+  border: 2px solid;
+  border-color: var(--hi) var(--dark) var(--dark) var(--hi);
+}
+.sunken {
+  border: 2px solid;
+  border-color: var(--shadow) var(--hi) var(--hi) var(--shadow);
+}
+
+/* ---------- Windows ---------- */
+.window {
+  background: var(--face);
+  padding: 3px;
+  border: 2px solid;
+  border-color: var(--hi) var(--dark) var(--dark) var(--hi);
+  box-shadow: 1px 1px 0 #000;
+}
+.titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 26px;
+  background: var(--title);
+  color: #fff;
+  padding: 2px 3px 2px 8px;
+  font-family: var(--font-pixel), Verdana, sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+}
+.tbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 20px;
+  padding: 0;
+  background: var(--face);
+  color: #000;
+  font: 700 13px/1 Verdana, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  border: 2px solid;
+  border-color: var(--hi) var(--dark) var(--dark) var(--hi);
+}
+.tbtn:active {
+  border-color: var(--dark) var(--hi) var(--hi) var(--dark);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  min-width: 88px;
+  padding: 0 16px;
+  background: var(--face);
+  color: #000;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  border: 2px solid;
+  border-color: var(--hi) var(--dark) var(--dark) var(--hi);
+}
+.btn:active:not(:disabled) {
+  border-color: var(--dark) var(--hi) var(--hi) var(--dark);
+}
+.btn:focus-visible,
+.btn:focus-within {
+  outline: 1px dotted #000;
+  outline-offset: -6px;
+}
+.btn:disabled {
+  color: var(--shadow);
+  text-shadow: 1px 1px 0 var(--hi);
+  cursor: default;
+}
+.btn-primary {
+  font-weight: 700;
+  box-shadow: 0 0 0 1px #000;
+}
+
+/* ---------- Inputs ---------- */
+.field {
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
+  color: #000;
+  font: inherit;
+  padding: 6px 8px;
+  border: 2px solid;
+  border-color: var(--shadow) var(--hi) var(--hi) var(--shadow);
+}
+.field:focus {
+  outline: 1px dotted #000;
+  outline-offset: -5px;
+}
+textarea.field {
+  font-family: "Courier New", Courier, monospace;
+  resize: vertical;
+}
+
+/* ---------- Links ---------- */
+.link {
+  color: var(--title);
+  text-decoration: underline;
+}
+.link:hover {
+  color: #0000c0;
+}
+
+/* ---------- Menu bar ---------- */
+.menubar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  border-bottom: 1px solid var(--shadow);
+}
+.menu-item {
+  padding: 4px 8px;
+  color: #000;
+  text-decoration: none;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+.menu-item:hover,
+.menu-item:focus-visible {
+  background: var(--title);
+  color: #fff;
+  outline: none;
+}
+
+/* ---------- Status bar ---------- */
+.statusbar {
+  display: flex;
+  gap: 3px;
+  padding-top: 3px;
+}
+.statusbar > span {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 2px 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid;
+  border-color: var(--shadow) var(--hi) var(--hi) var(--shadow);
+}
+
+/* ---------- Progress bar (25 segments) ---------- */
+.progress {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  background: #fff;
+  border: 2px solid;
+  border-color: var(--shadow) var(--hi) var(--hi) var(--shadow);
+}
+.progress .seg {
+  flex: 1 1 0;
+  height: 16px;
+}
+.progress .seg.on {
+  background: var(--title);
+}
+.progress.small .seg {
+  height: 10px;
+}
+
+/* ---------- 100-day grid ---------- */
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 3px;
+  padding: 6px;
+  background: #fff;
+  border: 2px solid;
+  border-color: var(--shadow) var(--hi) var(--hi) var(--shadow);
+}
+.cell {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font: 11px Verdana, sans-serif;
+  background: #fff;
+  color: #505050;
+  border: 2px solid;
+  border-color: var(--shadow) #e0e0e0 #e0e0e0 var(--shadow);
+}
+.cell.done {
+  background: var(--title);
+  color: #fff;
+  cursor: pointer;
+}
+.cell.done:hover {
+  background: #1414b4;
+}
+.cell.ms {
+  background: #ffff99;
+  color: #000;
+  font-weight: 700;
+}
+.cell.done.ms {
+  background: var(--title);
+  color: #ffff00;
+}
+.cell.next {
+  outline: 2px dotted #000;
+  outline-offset: -5px;
+  color: #000;
+  font-weight: 700;
+}
+.cell.selected {
+  outline: 2px solid #000;
+  outline-offset: 1px;
 }
