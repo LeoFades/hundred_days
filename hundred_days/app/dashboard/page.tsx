@@ -2,21 +2,15 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { supabase } from '@/lib/supabase/client'
+import { JourneyCard, summarize, type JourneyRow } from './journey-card'
 
-type Journey = { id: string; title: string; status: string; start_date: string }
-
-const STATUS_STYLE: Record<string, string> = {
-    active: 'bg-blue-100 text-blue-800',
-    completed: 'bg-green-100 text-green-800',
-    failed: 'bg-gray-200 text-gray-600',
-}
+const URGENCY = { 'last-chance': 0, due: 1, done: 2 } as const
 
 export default function DashboardPage() {
     const router = useRouter()
     const [email, setEmail] = useState<string | null>(null)
-    const [journeys, setJourneys] = useState<Journey[]>([])
+    const [journeys, setJourneys] = useState<JourneyRow[]>([])
     const [title, setTitle] = useState('')
     const [error, setError] = useState('')
     const [saving, setSaving] = useState(false)
@@ -25,7 +19,7 @@ export default function DashboardPage() {
         await supabase.rpc('refresh_my_journeys')
         const { data } = await supabase
             .from('journeys')
-            .select('id, title, status, start_date')
+            .select('id, title, status, start_date, timezone, ended_at, check_ins(checkin_date)')
             .order('created_at', { ascending: false })
         setJourneys(data ?? [])
     }, [])
@@ -64,7 +58,11 @@ export default function DashboardPage() {
 
     if (email === null) return <p className="p-6">Loading…</p>
 
-    const activeCount = journeys.filter((j) => j.status === 'active').length
+    // Active: most urgent first. Past: everything else, newest first.
+    const active = journeys
+        .filter((j) => j.status === 'active')
+        .sort((a, b) => URGENCY[summarize(a).today!] - URGENCY[summarize(b).today!])
+    const past = journeys.filter((j) => j.status !== 'active')
 
     return (
         <main className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
@@ -77,7 +75,7 @@ export default function DashboardPage() {
             <p className="text-sm text-gray-500">Logged in as {email}</p>
 
             {/* New journey */}
-            {activeCount < 2 ? (
+            {active.length < 2 ? (
                 <form onSubmit={createJourney} className="flex flex-col gap-2 rounded border p-4">
                     <label className="text-sm font-medium">Start a new 100-day journey</label>
                     <div className="flex gap-2">
@@ -103,28 +101,22 @@ export default function DashboardPage() {
                 </p>
             )}
 
-            {/* List */}
-            {journeys.length ? (
-                <ul className="flex flex-col gap-2">
-                    {journeys.map((j) => (
-                        <li key={j.id}>
-                            <Link
-                                href={`/journey/${j.id}`}
-                                className="flex items-center justify-between rounded border p-3 hover:bg-gray-50"
-                            >
-                                <span>
-                                    <span className="font-medium">{j.title}</span>
-                                    <span className="ml-2 text-sm text-gray-500">started {j.start_date}</span>
-                                </span>
-                                <span className={`rounded px-2 py-0.5 text-xs ${STATUS_STYLE[j.status]}`}>
-                                    {j.status}
-                                </span>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p>No journeys yet.</p>
+            {/* Active */}
+            <section className="flex flex-col gap-2">
+                <h2 className="font-medium">Active</h2>
+                {active.length ? (
+                    active.map((j) => <JourneyCard key={j.id} journey={j} />)
+                ) : (
+                    <p className="text-sm text-gray-500">No active journeys. Start one above.</p>
+                )}
+            </section>
+
+            {/* Past */}
+            {past.length > 0 && (
+                <section className="flex flex-col gap-2">
+                    <h2 className="font-medium">Past</h2>
+                    {past.map((j) => <JourneyCard key={j.id} journey={j} />)}
+                </section>
             )}
         </main>
     )
